@@ -1,4 +1,4 @@
-# Internship
+# Cell_Sighter Benchmarking
 
 
 # Cell_Sighter: Cell Classification Pipeline (WSL2-Ready)
