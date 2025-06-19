@@ -12,7 +12,7 @@ A reproducible pipeline for preprocessing, training, validating, and analyzing c
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/SchapiroLabor/Internship.git
+git clone https://github.com/SchapiroLabor/Marcel_Fastner_2025_Cell_Sighter.git
 cd path/to/your/folder/Cell_Sighter
 ```
 
