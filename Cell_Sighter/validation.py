@@ -216,18 +216,18 @@ if __name__ == "__main__":
             df_quant = df_quant.drop(columns=["true_phenotype_appended"])
             results_df = df_quant.dropna(subset=["true_phenotype"])
             results_df.to_csv(os.path.join(final_path, f"predictions_{args.fold_id}.csv"), na_rep="NaN")
-            with open(os.path.join(output_path, f"val_time_{args.fold_id}.txt"), "w") as f:
+            with open(os.path.join(final_path, f"val_time_{args.fold_id}.txt"), "w") as f:
                 f.write(f"{args.fold_id} training_time: {elapsed_time:.2f}\n")
     else:
         if args.output_path:
             final_path = os.path.join(output_dir, args.dataset, "Cell_Sighter", level)
             os.makedirs(final_path, exist_ok=True)
             results_df.to_csv(os.path.join(final_path, f"predictions_{args.fold_id}.csv"), na_rep="NaN")
-            with open(os.path.join(output_path, f"val_time_{args.fold_id}.txt"), "w") as f:
+            with open(os.path.join(final_path, f"val_time_{args.fold_id}.txt"), "w") as f:
                 f.write(f"{args.fold_id} training_time: {elapsed_time:.2f}\n")
         else:
             results_df.to_csv(os.path.join(output_dir, "results.csv"), index=False, na_rep="NaN")
-            with open(os.path.join(output_path, f"val_time_{args.fold_id}.txt"), "w") as f:
+            with open(os.path.join(output_dir, f"val_time_{args.fold_id}.txt"), "w") as f:
                 f.write(f"{args.fold_id} training_time: {elapsed_time:.2f}\n")
 
 
