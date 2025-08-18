@@ -95,6 +95,7 @@ def define_sampler(crops, hierarchy_match=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train Cell Sighter Model")
     parser.add_argument('--dataset', type=str, required=True, help='Dataset name, e.g. cHL_2_MIBI or IMMUcan')
+    parser.add_argument('--root', type=str, required=True, help='Path to the root folder of Cellsighter, where data is deposited')
     parser.add_argument('--fold_id', type=str, default='fold_0', help='Fold identifier, e.g. fold_0')
     parser.add_argument('--batch_size', type=int, default=256, help='Batch size for training')
     parser.add_argument('--num_workers', type=int, default=0, help='Number of workers for data loading')
@@ -109,8 +110,8 @@ if __name__ == "__main__":
         start_time = time.time()
 
     # Construct paths dynamically from dataset name
-    base_path = os.path.join("datasets", args.dataset)
-    result_path = os.path.join("results", args.dataset, args.cell_type_col)
+    base_path = os.path.join(args.root,"datasets", args.dataset)
+    result_path = os.path.join(args.root,"results", args.dataset, args.cell_type_col)
 
     os.makedirs(os.path.join(result_path, args.fold_id), exist_ok=True)
     writer = SummaryWriter(log_dir=os.path.join(result_path, 'logs', args.fold_id))

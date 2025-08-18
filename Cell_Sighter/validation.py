@@ -106,6 +106,8 @@ def define_sampler(crops, hierarchy_match=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Validation')
     parser.add_argument('--dataset', type=str, required=True)
+    parser.add_argument('--root',type=str,required=True, help='Data to the folder where all cellsighter data and the required folder structure is saved')
+    parser.add_argument('--data_root',type=str,required=True, help='Path to where tha raw data of the benchmark is saved')
     parser.add_argument('--fold_id', type=str, default='fold_0')
     parser.add_argument('--batch_size', type=int, default=256)
     parser.add_argument('--num_workers', type=int, default=8)
@@ -113,12 +115,11 @@ if __name__ == "__main__":
     parser.add_argument('--columns', type=str, nargs='+', default=None)
     parser.add_argument('--cell_type_col', type=str, default='cell_type')
     parser.add_argument('--append', action="store_true")
-    parser.add_argument('--data_root', type=str, default='')
     args = parser.parse_args()
 
     # Paths derived from dataset
-    base_path = os.path.join("datasets", args.dataset)
-    result_path = os.path.join("results", args.dataset, args.cell_type_col)
+    base_path = os.path.join(args.root,"datasets", args.dataset)
+    result_path = os.path.join(args.root,"results", args.dataset, args.cell_type_col)
     if args.output_path:
         output_path = args.output_path
         os.makedirs(os.path.join(output_path), exist_ok=True)
@@ -168,8 +169,8 @@ if __name__ == "__main__":
 
 
     # Map integer labels to names
-    results_df["true_phenotypes"] = results_df["true_labels"].map(label_map)
-    results_df["predicted_phenotypes"] = results_df["predicted_labels"].map(label_map)
+    results_df["true_phenotype"] = results_df["true_labels"].map(label_map)
+    results_df["predicted_phenotype"] = results_df["predicted_labels"].map(label_map)
 
     # Save the updated results
 
@@ -193,23 +194,23 @@ if __name__ == "__main__":
 
     # Save full results
     if args.append:
-        quant_path = os.path.join(args.data_root, "quantification", "processed", f"{args.dataset}_quantification.csv")
+        quant_path = os.path.join(args.data_root,args.dataset, "quantification", "processed", f"{args.dataset}_quantification.csv")
         df_quant = pd.read_csv(quant_path)
         df_quant["sample_id"] = df_quant["sample_id"].str.replace(r"\.csv$", "", regex=True)
 
         if args.output_path:
-            final_path = os.path.join(output_dir, args.dataset, "Cell_Sighter", level)
+            final_path = os.path.join(output_dir, args.dataset, "cellsighter", level)
             os.makedirs(final_path, exist_ok=True)
             df_quant = df_quant.merge(
-                results_df[["sample_id", "cell_id", "true_phenotypes", "predicted_phenotypes"]],
+                results_df[["sample_id", "cell_id", "true_phenotype", "predicted_phenotype"]],
                 on=["sample_id", "cell_id"],
                 how="left"
 )
-            df_quant[args.cell_type_col] = df_quant["true_phenotypes"]
-            df_quant = df_quant.rename(columns={"true_phenotypes": "true_phenotypes_appended"})
-            df_quant = df_quant.rename(columns={args.cell_type_col: "true_phenotypes"})
-            df_quant = df_quant.drop(columns=["true_phenotypes_appended"])
-            results_df = df_quant.dropna(subset=["true_phenotypes"])
+            df_quant[args.cell_type_col] = df_quant["true_phenotype"]
+            df_quant = df_quant.rename(columns={"true_phenotype": "true_phenotype_appended"})
+            df_quant = df_quant.rename(columns={args.cell_type_col: "true_phenotype"})
+            df_quant = df_quant.drop(columns=["true_phenotype_appended"])
+            results_df = df_quant.dropna(subset=["true_phenotype"])
             results_df.to_csv(os.path.join(final_path, f"predictions_{args.fold_id}.csv"), na_rep="NaN")
     else:
         if args.output_path:

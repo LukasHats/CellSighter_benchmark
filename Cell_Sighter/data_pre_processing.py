@@ -18,6 +18,7 @@ def parse_args():
 
     # Configuration file
     parser.add_argument("--num_folds", type=int, default=5)
+    parser.add_argument("--swap_train_test", action="store_true")
     parser.add_argument("--split", type=float, default=None)
     parser.add_argument("--crop_input_size", type=int, default=60)
     parser.add_argument("--crop_size", type=int, default=128)
@@ -109,13 +110,18 @@ def process_labels(quant_path, label_path, output_path, cell_type_col, exclude_c
 
     return df_label_map
 
-def create_kfold_splits(sample_ids, num_folds):
+def create_kfold_splits(sample_ids, num_folds, swap_train_test):
     kf = KFold(n_splits=num_folds, shuffle=True, random_state=42)
     folds = {}
     sample_ids_sorted = sorted(sample_ids)
     for i, (train_idx, test_idx) in enumerate(kf.split(sample_ids_sorted)):
-        folds[f"fold_{i}_train_set"] = [sample_ids_sorted[j] for j in train_idx]
-        folds[f"fold_{i}_test_set"] = [sample_ids_sorted[j] for j in test_idx]
+
+        if swap_train_test:
+            folds[f"fold_{i}_train_set"] = [sample_ids_sorted[j] for j in test_idx]
+            folds[f"fold_{i}_test_set"] = [sample_ids_sorted[j] for j in train_idx]
+        else:
+            folds[f"fold_{i}_train_set"] = [sample_ids_sorted[j] for j in train_idx]
+            folds[f"fold_{i}_test_set"] = [sample_ids_sorted[j] for j in test_idx]
     return folds
 
 def convert_numpy(obj):
@@ -183,7 +189,7 @@ def main():
         shutil.copyfile(channel_path, channel_out)
 
     if args.split:
-        folds = create_kfold_splits(sample_ids, args.num_folds)
+        folds = create_kfold_splits(sample_ids, args.num_folds, args.swap_train_test)
         with open(os.path.join(output_root, "..", "folds.json"), "w") as f:
             json.dump(folds, f, indent=4)
         print("Folds saved")
