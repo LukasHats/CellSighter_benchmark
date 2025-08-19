@@ -189,7 +189,7 @@ if __name__ == "__main__":
         else:
             patience += 1
             if i > args.epoch_min and patience > args.n_no_change:
-                print('Loss has not decreased in last {args.n_no_change} epochs. Therefore, terminating training process.')
+                print(f'Loss has not decreased in last {args.n_no_change} epochs. Therefore, terminating training process.')
                 break
 
     if args.time:
